@@ -4,6 +4,8 @@ const app = express();
 const bodyParser = require("body-parser");
 const exphbs = require("express-handlebars");
 const path = require("path");
+const { join } = require("path");
+
 require("dotenv").config();
 const { param, body, validationResult } = require("express-validator");
 const { ObjectId } = require("mongodb");
@@ -24,6 +26,7 @@ app.set("view engine", "hbs");
 
 // Set static folder
 app.use(express.static(path.join(__dirname, "public")));
+app.set("views", join(__dirname, "views"));
 
 //Databse connection
 mongoose
@@ -197,56 +200,3 @@ app.post(
 // Start server (process.env.PORT for Vercel)
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
-/*
-
-
-// Delete an existing movie (based on the _id or movie_id)
-app.delete("/api/movies/:movie_id", async (req, res) => {
-  try {
-    const { movie_id } = req.params;
-    let result;
-    if (mongoose.Types.ObjectId.isValid(movie_id)) {
-      result = await Movie.findByIdAndDelete(movie_id);
-    } else {
-      result = await Movie.findOneAndDelete({ Movie_ID: movie_id });
-    }
-    if (!result) {
-      return res.status(404).send("Movie not found");
-    }
-    res.send("Movie successfully deleted");
-  } catch (err) {
-    res.status(500).send(err);
-  }
-});
-
-// Update movie_title & "Released" of an existing movie (based on the _id or movie_id)
-app.put("/api/movies/:movie_id", async (req, res) => {
-  try {
-    const { movie_id } = req.params;
-    const { Title, Released } = req.body;
-    let movie;
-    if (mongoose.Types.ObjectId.isValid(movie_id)) {
-      movie = await Movie.findByIdAndUpdate(
-        movie_id,
-        { Title, Released },
-        { new: true }
-      );
-    } else {
-      movie = await Movie.findOneAndUpdate(
-        { Movie_ID: movie_id },
-        { Title, Released },
-        { new: true }
-      );
-    }
-    if (!movie) {
-      return res.status(404).send("Movie not found");
-    }
-    res.json(movie);
-  } catch (err) {
-    res.status(500).send(err);
-  }
-});
-
-app.listen(port);
-console.log("App listening on port : " + port);*/
