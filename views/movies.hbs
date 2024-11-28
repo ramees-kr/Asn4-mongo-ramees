@@ -1,0 +1,32 @@
+<h2>{{title}}</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Year</th>
+      <th>Rated</th>
+      <th>Genre</th>
+      <th>Director</th>
+      <th>Language</th>
+      <th>Awards</th>
+      <th>Poster</th>
+      <th>imdbRating</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each movies}}
+      <tr>
+        <td>{{this.Title}}</td>
+        <td>{{this.Year}}</td>
+        <td>{{this.Rated}}</td>
+        <td>{{this.Genre}}</td>
+        <td>{{this.Director}}</td>
+        <td>{{this.Language}}</td>
+        <td>{{this.Awards}}</td>
+        <td><img src="{{this.Poster}}" alt="Poster" width="100" /></td>
+        <td>{{this.imdbRating}}</td>
+      </tr>
+    {{/each}}
+  </tbody>
+</table>
