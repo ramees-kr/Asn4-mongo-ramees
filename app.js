@@ -136,7 +136,7 @@ app.post(
       // Show errors
       return res.status(400).render("error", {
         message: "Validation errors occurred",
-        errors: errors.array(),
+        errors: errors,
       });
     }
 
@@ -180,6 +180,8 @@ app.post(
         imdbID,
       });
 
+      console.log("movie created", movie);
+
       // Fetch all movies for the display page
       const movies = await Movie.find().lean();
 
@@ -196,6 +198,50 @@ app.post(
     }
   }
 );
+
+//Delete id form
+app.get("/movies/delete", (req, res) => {
+  res.render("delete-movie");
+});
+
+//Route to delete a movie, search by movie_id
+app.post("/movies/delete", async (req, res) => {
+  const movieId = req.body.movie_id.trim();
+  console.log("movieId", movieId);
+  console.log("type of movieId", typeof movieId);
+
+  try {
+    let movie;
+    if (ObjectId.isValid(movieId)) {
+      // Search by ObjectId
+      movie = await Movie.findById(movieId).lean();
+
+      if (movie) {
+        await Movie.findByIdAndDelete(movie._id);
+        res
+          .status(200)
+          .render("success", { message: "Movie deleted successfully" });
+      }
+    } else if (!isNaN(movieId)) {
+      // Search by numeric movie_id
+      movie = await Movie.findOne({ Movie_ID: parseInt(movieId) }).lean();
+
+      if (movie) {
+        await Movie.findByIdAndDelete(movie._id);
+        res
+          .status(200)
+          .render("success", { message: "Movie deleted successfully" });
+      }
+    } else {
+      res.status(404).render("error", { message: "Movie not found" });
+    }
+  } catch (error) {
+    console.error("Error Deleting movie:", error);
+    res
+      .status(500)
+      .render("error", { message: "Could not delete the selected movie" });
+  }
+});
 
 // Start server (process.env.PORT for Vercel)
 const PORT = process.env.PORT || 3000;
