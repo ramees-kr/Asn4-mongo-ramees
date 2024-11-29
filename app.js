@@ -243,6 +243,79 @@ app.post("/movies/delete", async (req, res) => {
   }
 });
 
+// Update id form
+app.get("/movies/edit", (req, res) => {
+  res.render("edit-search");
+});
+
+// Route to render the edit page
+app.post("/movies/edit-movie", async (req, res) => {
+  const movieId = req.body.movie_id.trim();
+  console.log("movieId", movieId);
+  console.log("type of movieId", typeof movieId);
+
+  try {
+    let movie;
+    if (mongoose.Types.ObjectId.isValid(movieId)) {
+      // Search by Mongoose _id
+      movie = await Movie.findById(movieId).lean();
+    } else if (!isNaN(movieId)) {
+      // Search by Movie_ID field
+      movie = await Movie.findOne({ Movie_ID: parseInt(movieId) }).lean();
+    }
+
+    if (!movie) {
+      return res.status(404).render("error", {
+        message: "Movie not found. Please try again.",
+      });
+    }
+
+    // Render the edit form with the movie data
+    res.render("edit-movie", {
+      movie_id: movie._id,
+      title: movie.Title || "",
+      year: movie.Year || "",
+      rating: movie.imdbRating || "",
+    });
+  } catch (error) {
+    console.error("Error finding movie:", err);
+    res.status(500).render("error", {
+      message: "An error occurred while searching for the movie.",
+    });
+  }
+});
+
+app.post("/movies/save", async (req, res) => {
+  try {
+    console.log(req.body);
+
+    // Extract the Movie ID and data from the request body
+    const movieId = req.body.movie_id.trim();
+    const { title: Title, year: Year, rating: imdbRating } = req.body;
+
+    // Find the movie by ID and update it with the new data
+    const movie = await Movie.findByIdAndUpdate(
+      movieId,
+      { Title, Year: parseInt(Year), imdbRating: parseFloat(imdbRating) },
+      { new: true }
+    );
+
+    console.log("movie updated", movie);
+
+    // If the movie is not found, return a 404 response
+    if (!movie) {
+      return res.status(404).send("Movie not found");
+    }
+
+    // Redirect to the movies list page
+    res.redirect("/movies");
+  } catch (error) {
+    // Log the error and send a 500 response
+    console.error("Error updating movie:", error);
+    res.status(500).send("An error occurred while updating the movie");
+  }
+});
+
 // Start server (process.env.PORT for Vercel)
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

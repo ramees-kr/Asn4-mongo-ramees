@@ -1,0 +1,26 @@
+<h2>Edit Movie</h2>
+<form method="POST" action="/movies/save" class="movie-form">
+  <input type="hidden" name="movie_id" value="{{movie_id}}" />
+  <div>
+    <label for="title">Title:</label>
+    <input type="text" id="title" name="title" value="{{title}}" required />
+  </div>
+  <div>
+    <label for="year">Year:</label>
+    <input type="number" id="year" name="year" value="{{year}}" required />
+  </div>
+  <div>
+    <label for="rating">Rating:</label>
+    <input
+      type="number"
+      id="rating"
+      name="rating"
+      value="{{rating}}"
+      step="0.1"
+      min="0"
+      max="10"
+      required
+    />
+  </div>
+  <input type="submit" value="Update Movie" />
+</form>
